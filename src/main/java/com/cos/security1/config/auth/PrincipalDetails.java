@@ -17,7 +17,7 @@ import lombok.Data;
 // 오브젝트 => Authentication 타입 객체
 // Authentication 안에 User 정보가 있어야 함.
 // User오브젝트타입 => UserDetails 타입 객체
-
+//
 // Security Session => Authentication => UserDetails(PrincipalDetails)
 
 @Data

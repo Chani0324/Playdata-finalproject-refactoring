@@ -14,24 +14,24 @@ import com.cos.security1.model.User;
 public interface UserRepository extends JpaRepository<User, Integer>{
 	// findBy : 규칙 => UserName : 문법
 	// select * from user where userName = ?
-	public User findByUserId(String username);
+	User findByUserId(String username);
+
+	User findByUserEmail(String Email);
 	
-	public User findByUserEmail(String Email);
-	
-	public User findByUserNameAndUserEmail(String username, String email);
+	User findByUserNameAndUserEmail(String username, String email);
 	
 	@Query("select count(u) from User u where userEmail = :userEmail")
-	public int countUserByUserEmail(@Param("userEmail") String userEmail);
+	int countUserByUserEmail(@Param("userEmail") String userEmail);
 	
 	@Query("select count(u) from User u where userId = :userId")
-    public int countUserByUserId(@Param("userId") String userId);
+    int countUserByUserId(@Param("userId") String userId);
 	
 	@Query("select count(u) from User u where userId = :userId and userName = :userName and userEmail = :userEmail")
-	public int countUserByUserIdAndUserNameAndUserEmail(@Param("userId") String userId, @Param("userName") String userName, @Param("userEmail") String userEmail);
+	int countUserByUserIdAndUserNameAndUserEmail(@Param("userId") String userId, @Param("userName") String userName, @Param("userEmail") String userEmail);
 	
-	public Optional<User> findByUserIdAndUserEmailAndUserName(String userId, String userEmail, String userName);
+	Optional<User> findByUserIdAndUserEmailAndUserName(String userId, String userEmail, String userName);
 	
-	public User findByUserIdAndUserNameAndUserEmail(String userId, String userName, String userEmail);
+	User findByUserIdAndUserNameAndUserEmail(String userId, String userName, String userEmail);
 	
-	public User findUserNameByUserIdAndUserEmail(String userId, String userEmail);
+	User findUserNameByUserIdAndUserEmail(String userId, String userEmail);
 }

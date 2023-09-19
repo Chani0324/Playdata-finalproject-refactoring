@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,26 +24,27 @@ import com.cos.security1.jwt.config.JwtProperties;
 import com.cos.security1.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@RequiredArgsConstructor
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
+
+    /*
+    Json과 Form 2가지 형태로 데이터가 들어올 때 맞춰서 id와 password를 받고 인증 요청을 위해 값을 return 한다.
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         
-        UsernamePasswordAuthenticationToken authenticationToken;
-        
-        System.out.println(request.getContentType());
+        UsernamePasswordAuthenticationToken authRequest;
         
         if (request.getContentType().equals(MimeTypeUtils.APPLICATION_JSON_VALUE)) {    // application/json
             // json request
             try {
                 // read request body and mapping to login dto class by object mapper
                 User user = objectMapper.readValue(request.getReader().lines().collect(Collectors.joining()), User.class);
-                authenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(user.getUserId(), user.getPassword());
-                System.out.println(authenticationToken);
-                
+                authRequest = UsernamePasswordAuthenticationToken.unauthenticated(user.getUserId(), user.getPassword());
+
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new AuthenticationServiceException("Request Content-Type(application/json) Parsing Error");
@@ -52,10 +54,10 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
             // form-request
             String userId = obtainUsername(request);
             String password = obtainPassword(request);
-            authenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(userId, password);
+            authRequest = UsernamePasswordAuthenticationToken.unauthenticated(userId, password);
         }
-        this.setDetails(request, authenticationToken);
-        return this.getAuthenticationManager().authenticate(authenticationToken);
+        this.setDetails(request, authRequest);
+        return this.getAuthenticationManager().authenticate(authRequest);
     }
 
     // attemptAuthentication 실행 후 인증이 정상적으로 되었으면 successfulAuthentication 함수가 실행됨.

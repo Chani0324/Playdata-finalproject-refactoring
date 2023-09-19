@@ -33,7 +33,7 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
     private final ObjectMapper objectMapper;
     
     private final JwtRefreshTokenService jwtRefreshTokenService;
-    
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
@@ -54,8 +54,6 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
         map.put("userEmail", userEntity.getUserEmail());
         
         String result = objectMapper.writeValueAsString(map);
-        
-        System.out.println("handler 실행됨. 인증이 완료 되었다는 뜻임.");
         
         // RSA방식이 아닌 Hash암호방식
         // access token 생성

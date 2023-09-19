@@ -6,7 +6,7 @@ import com.cos.security1.model.RefreshToken;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Integer>{
 
-    public RefreshToken findByUserId(String userId);
+    RefreshToken findByUserId(String userId);
     
-    public RefreshToken findRefreshTokenByUserId(String userId); 
+    RefreshToken findRefreshTokenByUserId(String userId);
 }
