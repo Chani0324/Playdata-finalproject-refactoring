@@ -35,19 +35,15 @@ public class JwtRefreshTokenService {
         
         User userEntity = userRepository.findByUserId(userId);
         
-        System.out.println("++++++++++++++++++++");
-        System.out.println(userId);
-        System.out.println(refreshToken);
-        
         if (userEntity != null) {
         
             if (userId != null && refreshToken != null) {
                 RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(userId);
                 if(refreshTokenEntity == null) {
                     RefreshToken rfToken = RefreshToken.builder()
-                    .userId(userId)
-                    .refreshToken(refreshToken)
-                    .build();
+                                                    .userId(userId)
+                                                    .refreshToken(refreshToken)
+                                                    .build();
                     
                     refreshTokenRepository.save(rfToken);
                 }else {
@@ -76,15 +72,15 @@ public class JwtRefreshTokenService {
             long now = System.currentTimeMillis();
             
             // refresh token 유효성 검사. 일반로그인과 oauth 로그인 나눠서 할 필요 있음...
-            String userId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(refreshToken).getClaim("userId").asString();
+            String userId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
+                    .verify(refreshToken)
+                    .getClaim("userId")
+                    .asString();
             
-            System.out.println("===========");
             User userEntity = userRepository.findByUserId(userId);
             if (userEntity != null) {
                 RefreshToken rfToken = refreshTokenRepository.findRefreshTokenByUserId(userId);
-                if (rfToken != null) {
-                    String getRefreshToken = rfToken.getRefreshToken();
-                    
+                if (rfToken != null) {  // 위에서 verify를 한번 했는데 또 할 필요가 있을까
                     // token 재발급
                     String newAccessToken = JWT.create()
                             .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
@@ -96,11 +92,14 @@ public class JwtRefreshTokenService {
 
                     // 현재시간과 refresh 토큰의 만료날짜를 통해 남은 만료시간 계산//
                     // refresh token 만료시간 계산하여 3일 미만일 시 refresh 토큰도 발급! //
-                    long refreshExpireTime = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(refreshToken).getClaim("exp").asLong();
+                    long refreshExpireTime = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
+                            .verify(refreshToken)
+                            .getClaim("exp")
+                            .asLong();
                     long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
                     long diffMin = (refreshExpireTime - now) / 1000 / 60;
                     
-                    if (diffDays <= 30) {
+                    if (diffDays >= JwtProperties.RT_EXPIRATION_TIME) {
                         String newRefreshToken = JWT.create()
                                 .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
                                 .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.RT_EXPIRATION_TIME))  
@@ -115,9 +114,9 @@ public class JwtRefreshTokenService {
                     result.put(JwtProperties.AT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
                     
                 }else {
-                    result.put("result", "유효하지 않은 token 입니다 ㅎ");
+                    result.put("result", "유효하지 않은 token 입니다");
                 }
-                
+
             }else {
                 result.put("result", "없는 회원정보입니다..");
             }

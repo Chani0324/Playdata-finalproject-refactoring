@@ -13,14 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class User implements Serializable{
 	@Id // PK

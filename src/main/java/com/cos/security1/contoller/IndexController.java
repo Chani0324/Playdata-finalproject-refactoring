@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -41,27 +40,20 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class IndexController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private NotSignedUserRepository notSignedUserRepository;
+    private final NotSignedUserRepository notSignedUserRepository;
     
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private PrincipalDetailsService principalDetailService;
+    private final PrincipalDetailsService principalDetailService;
     
-    @Autowired
-    private JwtRefreshTokenService jwtRefreshTokenService;
+    private final JwtRefreshTokenService jwtRefreshTokenService;
 
     private final EmailService emailService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @GetMapping("/test/login")
-    public @ResponseBody String loginTest(Authentication authentication, // DI(의존성 주입). 로그인 성공 이후에만 권한 가져올 수 있음. 로그인 이전에
+    public String loginTest(Authentication authentication, // DI(의존성 주입). 로그인 성공 이후에만 권한 가져올 수 있음. 로그인 이전에
                                                                          // 불러올 시 null값
             @AuthenticationPrincipal PrincipalDetails userDetails) { // @AuthenticationPrincipal을 통해 session 정보를 가져올 수
                                                                      // 있다. PrincipalDetails는 userDetails을 상속받았기 때문에 해당
@@ -75,7 +67,7 @@ public class IndexController {
     }
 
     @GetMapping("/test/oauth/login")
-    public @ResponseBody String oauthLoginTest(Authentication authentication, // DI(의존성 주입)
+    public String oauthLoginTest(Authentication authentication, // DI(의존성 주입)
             @AuthenticationPrincipal OAuth2User oauth) {
 
         System.out.println("/test/oauth/login==========");
@@ -88,7 +80,7 @@ public class IndexController {
 
     // localhost:8080 //
     @GetMapping({ "", "/" })
-    public @ResponseBody String index(HttpServletRequest request) {
+    public String index(HttpServletRequest request) {
         // mustache 사용 (template의 한 종류). 기본 폴더 src/main/resources/
         // view resolver 설정 : templates (prefix).mustache (suffix) 생략 가능.
         return "index"; // src/main/resources/templates/index.mustache 를 기본 경로로 찾음.
@@ -102,18 +94,18 @@ public class IndexController {
      */
     // OAuth 및 일반 로그인을 해도 PrincipalDetails로 받아옴.
     @GetMapping("/user")
-    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         System.out.println("principalDetails:" + principalDetails.getUser());
         return "user";
     }
 
     @GetMapping("/admin")
-    public @ResponseBody String admin() {
+    public String admin() {
         return "admin";
     }
 
     @GetMapping("/manager")
-    public @ResponseBody String manager() {
+    public String manager() {
         return "manager";
     }
 
@@ -131,7 +123,7 @@ public class IndexController {
 
     // JSON, xml 타입만 받도록
     @PostMapping("/join")
-    public @ResponseBody Map<String, Boolean> joinUser(@RequestBody User user) throws Exception {
+    public Map<String, Boolean> joinUser(@RequestBody User user) throws Exception {
         
         System.out.println(user.getUserId());
         User newUser = user;
@@ -188,7 +180,7 @@ public class IndexController {
     }
     
     @GetMapping("/checkexistemail")
-    public @ResponseBody Map<String, Boolean> isExistEmail(User user) throws Exception {
+    public Map<String, Boolean> isExistEmail(User user) throws Exception {
         
         Map<String, Boolean> result = new HashMap<>();
         
@@ -206,7 +198,7 @@ public class IndexController {
     }
     
     @GetMapping("/checkexistid")
-    public @ResponseBody Map<String, Boolean> isExistid(User user) throws Exception {
+    public Map<String, Boolean> isExistid(User user) throws Exception {
         
         Map<String, Boolean> result = new HashMap<>();
         
@@ -225,7 +217,7 @@ public class IndexController {
     
     
     @PostMapping("/issignedin")
-    public @ResponseBody Map<String, Integer> isSignedIn(@RequestBody NotSignedUser notSignedUser) throws Exception {
+    public Map<String, Integer> isSignedIn(@RequestBody NotSignedUser notSignedUser) throws Exception {
         
         Map<String, Integer> result = new HashMap<>();
         NotSignedUser thisUser = notSignedUserRepository.findByvisitUserIp(notSignedUser.getVisitUserIp());
@@ -249,7 +241,7 @@ public class IndexController {
     @Secured("ROLE_ADMIN") // 특정 권한을 가진 유저만 해당경로로 접근 가능. SecurityConfig에서 해당 Class를
                            // @EnableGlobalMethodSecurity(securedEnabled=true) 처리 해주어야 함!
     @GetMapping("/info")
-    public @ResponseBody String info() {
+    public String info() {
         return "개인정보";
     }
 
@@ -258,13 +250,13 @@ public class IndexController {
                                                                       // @EnableGlobalMethodSecurity(prePostEnabled=true)
                                                                       // 처리 해주어야 함!
     @GetMapping("/data")
-    public @ResponseBody String data() {
+    public String data() {
         return "데이터정보";
     }
 
     // JSON 타입으로 변환 후 return
     @GetMapping("/findUserId")
-    public @ResponseBody boolean findUserId(User user) {
+    public boolean findUserId(User user) {
 
         boolean findUsername = principalDetailService.findUserId(user);
 
@@ -273,7 +265,7 @@ public class IndexController {
 
     // JSON 타입으로 변환 후 return
     @GetMapping("/findEmail")
-    public @ResponseBody boolean findEmail(User user) {
+    public boolean findEmail(User user) {
 
         boolean findEmail = principalDetailService.findUserEmail(user);
 
@@ -282,7 +274,7 @@ public class IndexController {
 
     // JSON 타입으로 변환 후 return
     @GetMapping("/findUserIdByEmailAndUsername")
-    public @ResponseBody Map<String, String> findUserIdByEmailAndUsername(HttpServletRequest httpServletRequest, User user) {
+    public Map<String, String> findUserIdByEmailAndUsername(HttpServletRequest httpServletRequest, User user) {
 
         Map<String, String> result = new HashMap<>();
 
@@ -295,7 +287,7 @@ public class IndexController {
 
     // JSON 타입으로 변환 후 return. 로그인 후 session에 권한이 저장되어 있어야지만 수정할 수 있도록 해놓을 예정.
     @PostMapping("/updatelogineduserpw")
-    public @ResponseBody Map<String, String> updateLoginedUserPassword(@RequestBody User user,
+    public Map<String, String> updateLoginedUserPassword(@RequestBody User user,
             @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
         Map<String, String> result = new HashMap<>();
@@ -317,7 +309,7 @@ public class IndexController {
     }
 
     @PostMapping("/updateuserpw")
-    public @ResponseBody Map<String, String> updateUnloginedUserPassword(@RequestBody User user) {
+    public Map<String, String> updateUnloginedUserPassword(@RequestBody User user) {
 
         Map<String, String> result = new HashMap<>();
         System.out.println(user.getUserId());
@@ -337,7 +329,7 @@ public class IndexController {
     }
 
     @GetMapping("/refresh")
-    public @ResponseBody Map<String, String> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+    public Map<String, String> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         Map<String, String> result = new HashMap<>();
         
         String authorizationHeader = request.getHeader(JwtProperties.HEADER_STRING);
