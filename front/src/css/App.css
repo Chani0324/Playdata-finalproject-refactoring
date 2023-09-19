@@ -1,0 +1,262 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+.navbar {
+  font-weight: bold;
+}
+.navbar-brand {
+  padding-left : 5%;
+  font-size: 3em;
+}
+
+.collapse {
+  padding-right : 3%;
+}
+
+.upload_div {
+  margin-left : 10%;
+
+  width: 80%;
+  height:  575px;
+  text-align: center;
+  border: 3px gray dashed;
+  background: #E8EDED;
+  border-radius: 80px;
+}
+
+.ad_banner {
+  margin-top: 3.5%;
+}
+
+/* Desktop CSS*/
+.cat-btn-desktop {
+  width: 5em;
+  height: 2em;
+  margin: 1em 1em 0 1em;
+
+  background: white;
+  color: black;
+  cursor: pointer;
+
+  font-size: 1em;
+  font-weight: bold;
+
+  letter-spacing: 0.1em;
+
+  box-shadow: -1px 3px 3px 0 rgba(80, 80, 80, 0.698);
+  opacity: 0.6;
+  border: none;
+  border-radius: 5px;
+}
+.cat-btn-desktop:hover{
+  background: white;
+  opacity: 1;
+}
+
+.ad-banner-desktop {
+  margin-top: 3.5%;
+}
+
+.result-row-desktop {
+  margin-top: 1vh;
+  height: 100vh;
+  display: flex;
+}
+
+.left-result-desktop{
+  flex: 3;
+  border-right: 1px solid;
+}
+
+.left-top-image-desktop {
+  margin-top: 1.2em;
+  width: 22em; 
+  height: 34em;
+  
+  overflow: hidden;
+
+  box-shadow: -4px 5px 5px 0 rgba(80, 80, 80, 0.698);
+  background: #E8EDED;
+  border-radius: 2em;
+}
+
+.left-image-changeBtn{
+  margin-top: 2.4em;
+  margin-bottom: 0.2em;
+  background: none;
+  font-weight: 600;
+  font-size: 1.3em;
+  border: none;
+}
+
+.left-bottom-text-desktop {
+  width: 22em;
+  height: 16em;
+  margin: 2em auto;  
+  overflow: hidden;
+  background: #E8EDED;
+  background-size: cover;
+  border-radius: 2em;
+  box-shadow: -4px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+.right-result-desktop{
+  margin: 2vh 3.5vw 0 3.5vw;
+  flex: 9;
+  height: 58em;
+  overflow-x: hidden;
+  background: #E8EDED;
+  border-radius: 2.4vw;
+  box-shadow: -4px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+.result-category-desktop{
+  position: absolute;
+  text-align: left;
+  width: auto;
+  height: 4em;
+  background: #6e6e6E;
+  border-top-left-radius: 2em;
+  border-bottom-right-radius: 2em;
+}
+
+.result-list-desktop{
+  margin : 0.6em auto;
+  background: #E8EDED;
+  overflow-y: scroll;
+}
+
+
+.right-result-desktop::-webkit-scrollbar {
+  width: 0.8em;
+  background: hidden;
+  border-radius: 6px;
+}
+
+.right-result-desktop::-webkit-scrollbar-thumb {
+  border-radius: 2vw;
+  background: #6e6e6E;
+  border: 6px solid rgba(0, 0, 0, 0.2);
+}
+
+.result-img-desktop {
+  width: 13.9em;
+  height: 20em;
+  margin: 2em 1em 1em 3.4em;
+  border-radius: 1.6em;
+  box-shadow: -3px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+/* Tablet CSS*/
+.left-top-image-tablet {
+  margin: 4em 0 0 0;
+  border-radius: 1.8em;
+  width: 20em;
+  height: 31em;
+  position: relative;
+  box-shadow: -4px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+.result-category-tablet{
+  /* position: absolute; */
+
+  width: 100%;
+  height: 5em;
+  background: #6e6e6E;
+  border-top-left-radius: 1.3em;
+  border-top-right-radius: 1.3em;
+}
+
+.result-category-mobile{
+  width: 100%;
+  height: 3em;
+  background: #6e6e6E;
+  border-top-left-radius: 1.3em;
+  border-top-right-radius: 1.3em;
+}
+
+.result-list-tablet{
+  background: #E8EDED;
+  overflow-y: scroll;
+}
+
+.cat-btn-tablet {
+  width: 4em;
+  height: 1.7em;
+  margin: 0.7em 1em 0 1em;
+
+  background: white;
+  color: black;
+  cursor: pointer;
+
+  font-size: 1em;
+  font-weight: bold;
+
+  letter-spacing: 0.1em;
+
+  box-shadow: -1px 3px 3px 0 rgba(80, 80, 80, 0.698);
+  opacity: 0.6;
+  border: none;
+  border-radius: 5px;
+}
+.cat-btn-tablet:hover{
+  background: white;
+  opacity: 1;
+}
+
+.result-img-tablet {
+  width: 12em;
+  height: 15em;
+  margin: 1.5em 1em 1em 1em;
+  border-radius: 1em;
+  box-shadow: -3px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+.cat-btn-mobile {
+  width: 4.4em;
+  height: 2.3em;
+  margin: 1.5em 1em 0 1em;
+
+  background: white;
+  color: black;
+  cursor: pointer;
+
+  font-size: 0.8em;
+  font-weight: bold;
+
+  letter-spacing: 0.1em;
+
+  box-shadow: -1px 3px 3px 0 rgba(80, 80, 80, 0.698);
+
+  border: none;
+  border-radius: 5px;
+}
+
+.result-img-mobile {
+  width: 11em;
+  height: 14em;
+  margin: 1em 1.1em 2em 1.1em;
+  border-radius: 0.5em;
+  box-shadow: -3px 5px 5px 0 rgba(80, 80, 80, 0.698);
+}
+
+.cat-btn-mobile:hover{
+  background: aquamarine;
+  opacity: 0.8;
+  transition: all 0.5s ease;
+}

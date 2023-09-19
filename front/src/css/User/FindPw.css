@@ -1,0 +1,256 @@
+/* 여기서부터 공통 css 시작 */
+.user-bg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.user-bg-rectangle {
+    background-color: #1E1E1E;
+    width: 1100px;
+    height: 650px;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title {
+    margin-top: 270px;
+    margin-left: 150px;
+    display: flex;
+}
+
+.vibration {
+    animation: vibration .1s infinite;
+}
+
+
+/* Tablet Mode */
+.user-bg-rectangle-tablet {
+    width: 700px;
+    height: 800px;
+    border-radius: 50px;
+    background-color: #1E1E1E;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title-tablet {
+    margin-top: 7vh;
+    margin-left: 170px;
+    display: flex;
+}
+
+/* Mobile Mode */
+.user-bg-mobile {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+@keyframes vibration {
+    from {
+    transform: rotate(1deg);
+    }
+    to {
+    transform: rotate(-1deg);
+    }
+}
+  /* 여기까지 공통 css 종료 */
+
+  /* 여기서부터 Find Pw 페이지 css 시작 */
+.findpw-title-img {
+    margin-top: 7%;
+}
+
+.findpw-logo-img {
+    margin-bottom: 0%;
+    margin-top: 6%;
+    margin-right: 57%;
+}
+
+.findpw-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.findpw-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.findpw-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.findpw-input-name {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.findpw-input-email, .findpw-input-id  {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+.findpw-input-cn{
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+    margin-top: "-10px";
+    padding-left: 10px;
+}
+
+.findpw-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 40px;
+}
+
+.findpw-input-name-text, .findpw-input-id-text,
+.findpw-input-email-text, .findpw-input-cn-text {
+    margin-bottom: 0%;
+    font-weight: 5;
+    font-size: 15px;
+    margin-top: 4%;
+}
+
+.findpw-input-name-text {
+    margin-top: 7%;
+}
+  /* 여기까지 Find Pw 페이지 css 종료 */
+
+  /* 여기서부터 Reset Pw 페이지 css 시작 */
+.resetpw-title-img {
+    margin-top: 13%;
+    margin-bottom: 6%;
+}
+
+.resetpw-logo-img {
+    margin-right: 50%;
+    margin-top: 5%;
+}
+
+.resetpw-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.resetpw-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.resetpw-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.resetpw-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.resetpw-re-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.resetpw-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 60px;
+}
+
+.resetpw-input-pw-text, .resetpw-re-input-pw-text {
+    margin-bottom: 0%;
+    margin-top: 5%;
+    font-weight: 5;
+    font-size: 15px;
+}
+  /* 여기까지 Reset Pw 페이지 css 종료 */

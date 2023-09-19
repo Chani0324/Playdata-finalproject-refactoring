@@ -1,0 +1,567 @@
+/* 여기서부터 공통 css 시작 */
+.user-bg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.user-bg-rectangle {
+    background-color: #1E1E1E;
+    width: 1100px;
+    height: 650px;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title {
+    margin-top: 270px;
+    margin-left: 150px;
+    display: flex;
+}
+
+.vibration {
+    animation: vibration .1s infinite;
+}
+
+
+/* Tablet Mode */
+.user-bg-rectangle-tablet {
+    width: 700px;
+    height: 800px;
+    border-radius: 50px;
+    background-color: #1E1E1E;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title-tablet {
+    margin-top: 7vh;
+    margin-left: 170px;
+    display: flex;
+}
+
+/* Mobile Mode */
+.user-bg-mobile {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+@keyframes vibration {
+    from {
+    transform: rotate(1deg);
+    }
+    to {
+    transform: rotate(-1deg);
+    }
+}
+  /* 여기까지 공통 css 종료 */
+
+  /* 여기서부터 Login 페이지 css 시작 */
+.login-title-img {
+    margin-top: 20%;
+}
+
+.login-logo-img {
+    margin-left: -20%;
+    margin-top: 5%;
+    position: absolute;
+}
+
+.login-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.login-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.login-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.login-input-id {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 10%;
+    padding-left: 10px;
+}
+
+.login-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 20px;
+    padding-left: 10px;
+}
+
+.login-find-id > a, .login-find-pw > a, .create-account > a {
+    color: #000000;
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 16px;
+    text-decoration: none;
+    float: right;
+    margin-right: 50px;
+    margin-top: 10px;
+}
+
+.login-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 15%;
+}
+
+.google-login, .facebook-login, .apple-login {
+    background: #FFFFFF;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    width: 75px;
+    height: 48px;
+    border: 0;
+    margin-bottom: -10px;
+    margin-left: 20px;
+    margin-top: 50px;
+}
+
+.sns-login-buttons {
+    position:absolute;
+    margin-left: 12%;
+    margin-top: 5%;
+}
+  /* 여기까지 Login 페이지 css 종료 */
+
+  /* 여기서부터 회원가입 페이지 css 시작 */
+.register-title-img {
+    margin-top: 15%;
+    margin-bottom: 0%;
+}
+
+.register-logo-img {
+    margin-bottom: 19%;
+    margin-top: 5%;
+    margin-left: -20%;
+    position: absolute;
+}
+
+.register-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.register-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.register-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.register-input-name {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.register-input-mail, .register-input-id,
+.register-input-pw, .register-input-re-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 0%;
+    padding-left: 10px;
+}
+
+.register-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 40px;
+}
+
+.register-input-name-text, .register-input-mail-text, 
+.register-input-id-text, .register-input-pw-text,
+.register-input-re-pw-text {
+    margin-bottom: 1%;
+    font-weight: 5;
+    font-size: 12px;
+    margin-top: 3%;
+    color: #494949;
+}
+  /* 여기까지 회원가입 페이지 css 종료 */
+
+  /* 여기서부터 Find Id 페이지 css 시작 */
+.findid-title-img {
+    margin-top: 25%;
+}
+
+.findid-logo-img {
+    margin-left: -20%;
+    margin-top: 5%;
+    margin-bottom: 23%;
+    position: absolute;
+}
+
+.findid-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.findid-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.findid-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.findid-input-name {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.findid-input-email {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.find-pw > a {
+    color: #000000;
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 16px;
+    text-decoration: none;
+    float: right;
+    margin-right: 50px;
+    margin-top: 10px;
+}
+
+.findid-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 40px;
+}
+
+.findid-input-name-text, .findid-input-email-text {
+    margin-bottom: 0%;
+    font-weight: 5;
+    font-size: 15px;
+    margin-top: 5%;
+}
+
+.findid-input-name-text {
+    margin-top: 13%;
+}
+  /* 여기까지 Find Id 페이지 css 종료 */
+
+  /* 여기서부터 Find Pw 페이지 css 시작 */
+.findpw-title-img {
+    margin-top: 7%;
+}
+
+.findpw-logo-img {
+    margin-bottom: 0%;
+    margin-top: 6%;
+    margin-right: 57%;
+}
+
+.findpw-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.findpw-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.findpw-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.findpw-input-name {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.findpw-input-email, .findpw-input-id, .findpw-input-cn {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.findpw-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 40px;
+}
+
+.findpw-input-name-text, .findpw-input-id-text,
+.findpw-input-email-text, .findpw-input-cn-text {
+    margin-bottom: 0%;
+    font-weight: 5;
+    font-size: 15px;
+    margin-top: 4%;
+}
+
+.findpw-input-name-text {
+    margin-top: 7%;
+}
+  /* 여기까지 Find Pw 페이지 css 종료 */
+
+  /* 여기서부터 Reset Pw 페이지 css 시작 */
+.resetpw-title-img {
+    margin-top: 13%;
+    margin-bottom: 6%;
+}
+
+.resetpw-logo-img {
+    margin-right: 50%;
+    margin-top: 5%;
+}
+
+.resetpw-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.resetpw-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.resetpw-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.resetpw-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.resetpw-re-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 1%;
+    padding-left: 10px;
+}
+
+.resetpw-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 60px;
+}
+
+.resetpw-input-pw-text, .resetpw-re-input-pw-text {
+    margin-bottom: 0%;
+    margin-top: 5%;
+    font-weight: 5;
+    font-size: 15px;
+}
+  /* 여기까지 Reset Pw 페이지 css 종료 */

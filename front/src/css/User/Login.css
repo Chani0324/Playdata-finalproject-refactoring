@@ -1,0 +1,174 @@
+/* 여기서부터 공통 css 시작 */
+.user-bg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.user-bg-rectangle {
+    background-color: #1E1E1E;
+    width: 1100px;
+    height: 650px;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title {
+    margin-top: 270px;
+    margin-left: 150px;
+    display: flex;
+}
+
+.vibration {
+    animation: vibration .1s infinite;
+}
+
+
+/* Tablet Mode */
+.user-bg-rectangle-tablet {
+    width: 700px;
+    height: 800px;
+    border-radius: 50px;
+    background-color: #1E1E1E;
+    position: relative;
+    border: 1px solid #000000;
+}
+
+.user-bg-title-tablet {
+    margin-top: 7vh;
+    margin-left: 170px;
+    display: flex;
+}
+
+/* Mobile Mode */
+.user-bg-mobile {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+@keyframes vibration {
+    from {
+    transform: rotate(1deg);
+    }
+    to {
+    transform: rotate(-1deg);
+    }
+}
+  /* 여기까지 공통 css 종료 */
+
+ /* 여기서부터 Login 페이지 css 시작 */
+.login-title-img {
+    margin-top: 20%;
+}
+
+.login-logo-img {
+    margin-left: -20%;
+    margin-top: 5%;
+    position: absolute;
+}
+
+.login-rectangle {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 600px;
+}
+
+/* Tablet Mode */
+.login-rectangle-tablet {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 400px;
+    height: 600px;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    position: absolute;
+
+    margin-left: 5px;
+    margin-top: 110px;
+}
+
+/* Mobile Mode */
+.login-rectangle-mobile {
+    background: #ffffff;
+    box-sizing: border-box;
+    width: 380px;
+    height: 600px;
+    border: none;
+    border-radius: 20px;
+    position: absolute;
+
+    margin-left: 0px;
+}
+
+.login-input-id {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 10%;
+    padding-left: 10px;
+}
+
+.login-input-pw {
+    box-sizing: border-box;
+    width: 300px;
+    height: 40px;
+
+    border: 1px solid #494949;
+    border-radius: 8px;
+
+    margin-top: 20px;
+    padding-left: 10px;
+}
+
+.login-find-id > a, .login-find-pw > a, .create-account > a {
+    color: #000000;
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 16px;
+    text-decoration: none;
+    float: right;
+    margin-right: 50px;
+    margin-top: 10px;
+}
+
+.login-button {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 300px;
+    height: 40px;
+    margin-top: 15%;
+}
+
+.google-login, .facebook-login, .apple-login {
+    background: #FFFFFF;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    width: 75px;
+    height: 48px;
+    border: 0;
+    margin-bottom: -10px;
+    margin-left: 20px;
+    margin-top: 50px;
+}
+
+.sns-login-buttons {
+    position:absolute;
+    margin-left: 12%;
+    margin-top: 5%;
+}
+  /* 여기까지 Login 페이지 css 종료 */
