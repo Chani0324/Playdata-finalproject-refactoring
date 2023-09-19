@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.bytebuddy.implementation.bind.annotation.Super;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,18 +32,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
     
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
-    @Autowired
-	private UserRepository userRepository;
-	
+	private final UserRepository userRepository;
+
 	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, ObjectMapper objectMapper) {
 		super(authenticationManager);
 		this.userRepository = userRepository;
 		this.objectMapper = objectMapper;
-	} 
-	
+	}
+
 	// 무조건 한번은 지나치게 되는 기본 권한확인 필터
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

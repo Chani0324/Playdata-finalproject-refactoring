@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -112,40 +113,36 @@ public class IndexController {
     // 스프링 시큐리티가 해당 주소를 intercept함..
     // -> SecurityConfig 파일 생성 후 @Bean에서 등록한 특정 경로 제외 설정 후 intercept를 하지 않음!
     @GetMapping("/loginForm")
-    public String loginForm() {
-        return "loginForm";
+    public ModelAndView loginForm() {
+        return new ModelAndView("loginForm");
     }
 
     @GetMapping("/joinForm")
-    public String joinForm() {
-        return "joinForm";
+    public ModelAndView joinForm() {
+        return new ModelAndView("joinForm");
     }
 
     // JSON, xml 타입만 받도록
     @PostMapping("/join")
     public Map<String, Boolean> joinUser(@RequestBody User user) throws Exception {
         
-        System.out.println(user.getUserId());
-        User newUser = user;
         Map<String, Boolean> result = new HashMap<>();
-        
+        result.put("result", false);
+
         boolean isExistId = principalDetailService.checkExistUserId(user.getUserId());
         boolean isExistEmail = principalDetailService.checkExistUserEmail(user.getUserEmail());
-        
+
         if(!isExistId && !isExistEmail) {
-            principalDetailService.joinUser(newUser);
-            emailService.sendMail(user, "register");
+            principalDetailService.joinUser(user);
+//            emailService.sendMail(user, "register");
             result.put("result", true);
-            
+
             return result;
-        } else if(isExistId == true || isExistEmail == true) {
-            result.put("result", false);
+        } else if(isExistId || isExistEmail) {
             result.put("isExistId", isExistId);
             result.put("isExistEmail", isExistEmail);
 
-            return result;
         }
-        
         return result;
     }
     

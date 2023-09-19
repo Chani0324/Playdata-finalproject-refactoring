@@ -21,6 +21,7 @@ import com.cos.security1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class JwtRefreshTokenService {
     
@@ -28,18 +29,17 @@ public class JwtRefreshTokenService {
     
     private final UserRepository userRepository;
     
-    @Transactional
     public boolean updateRefreshToken(String userId, String refreshToken) {
         
         boolean result = false;
         
-        User userEntity = userRepository.findByUserId(userId);
+        User user = userRepository.findByUserId(userId);
         
-        if (userEntity != null) {
+        if (user != null) {
         
             if (userId != null && refreshToken != null) {
-                RefreshToken refreshTokenEntity = refreshTokenRepository.findByUserId(userId);
-                if(refreshTokenEntity == null) {
+                RefreshToken findRefreshToken = refreshTokenRepository.findByUserId(userId);
+                if(findRefreshToken == null) {
                     RefreshToken rfToken = RefreshToken.builder()
                                                     .userId(userId)
                                                     .refreshToken(refreshToken)
@@ -47,9 +47,9 @@ public class JwtRefreshTokenService {
                     
                     refreshTokenRepository.save(rfToken);
                 }else {
-                    refreshTokenEntity.setRefreshToken(refreshToken);
+                    findRefreshToken.setRefreshToken(refreshToken);
                     
-                    refreshTokenRepository.save(refreshTokenEntity);
+                    refreshTokenRepository.save(findRefreshToken);
                 }
                 result = true;
               } else {
@@ -66,63 +66,55 @@ public class JwtRefreshTokenService {
     
     
     public Map<String, String> refresh(String refreshToken) throws IOException, ServletException {
-        
+
         Map<String, String> result = new HashMap<>();
-        try {
-            long now = System.currentTimeMillis();
-            
-            // refresh token 유효성 검사. 일반로그인과 oauth 로그인 나눠서 할 필요 있음...
-            String userId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
+
+        long now = System.currentTimeMillis();
+
+        // refresh token 유효성 검사. 일반로그인과 oauth 로그인 나눠서 할 필요 있음...
+        String userId = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
+                .verify(refreshToken)
+                .getClaim("userId")
+                .asString();
+
+        User userEntity = userRepository.findByUserId(userId);
+        if (userEntity != null) {   // refresh 토큰이 존재함. 근데 만료 된건지 안된건지는 모름.
+            // 현재시간과 refresh 토큰의 만료날짜를 통해 남은 만료시간 계산//
+            // refresh token 만료시간 계산하여 3일 미만일 시 refresh 토큰도 발급! //
+            long refreshExpireTime = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
                     .verify(refreshToken)
-                    .getClaim("userId")
-                    .asString();
-            
-            User userEntity = userRepository.findByUserId(userId);
-            if (userEntity != null) {
-                RefreshToken rfToken = refreshTokenRepository.findRefreshTokenByUserId(userId);
-                if (rfToken != null) {  // 위에서 verify를 한번 했는데 또 할 필요가 있을까
-                    // token 재발급
-                    String newAccessToken = JWT.create()
-                            .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
-                            .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.AT_EXPIRATION_TIME))  
-                            .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
-                            .withClaim("userEmail", userEntity.getUserEmail())    // 내가 넣고 싶은 비공개 key와 value 값
-                            .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
-                            .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+                    .getClaim("exp")
+                    .asLong();
+            long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
+            long diffMin = (refreshExpireTime - now) / 1000 / 60;
 
-                    // 현재시간과 refresh 토큰의 만료날짜를 통해 남은 만료시간 계산//
-                    // refresh token 만료시간 계산하여 3일 미만일 시 refresh 토큰도 발급! //
-                    long refreshExpireTime = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build()
-                            .verify(refreshToken)
-                            .getClaim("exp")
-                            .asLong();
-                    long diffDays = (refreshExpireTime - now) / 1000 / (24 * 3600);
-                    long diffMin = (refreshExpireTime - now) / 1000 / 60;
-                    
-                    if (diffDays >= JwtProperties.RT_EXPIRATION_TIME) {
-                        String newRefreshToken = JWT.create()
-                                .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
-                                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.RT_EXPIRATION_TIME))  
-                                .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
-                                .withClaim("userEmail", userEntity.getUserEmail())    // 내가 넣고 싶은 비공개 key와 value 값
-                                .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
-                                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-                        
-                        result.put(JwtProperties.RT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + newRefreshToken);
-                        updateRefreshToken(userId, newRefreshToken);
-                    }
-                    result.put(JwtProperties.AT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
-                    
-                }else {
-                    result.put("result", "유효하지 않은 token 입니다");
-                }
+            if (diffDays <= JwtProperties.DIFF_EXPIRATION_TIME) {
+                // refresh token 재발급
+                String newRefreshToken = JWT.create()
+                        .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
+                        .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.RT_EXPIRATION_TIME))
+                        .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
+                        .withClaim("userEmail", userEntity.getUserEmail())    // 내가 넣고 싶은 비공개 key와 value 값
+                        .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
+                        .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
-            }else {
-                result.put("result", "없는 회원정보입니다..");
+                result.put(JwtProperties.RT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + newRefreshToken);
+                updateRefreshToken(userId, newRefreshToken);
             }
-            
-        }catch(TokenExpiredException e) {
-            throw new TokenExpiredException("만료된 토큰입니다~");
+
+            // access token 재발급
+            String newAccessToken = JWT.create()
+                    .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
+                    .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.AT_EXPIRATION_TIME))
+                    .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
+                    .withClaim("userEmail", userEntity.getUserEmail())    // 내가 넣고 싶은 비공개 key와 value 값
+                    .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
+                    .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+            result.put(JwtProperties.AT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + newAccessToken);
+
+        }else {
+            result.put("result", "없는 회원정보입니다..");
         }
         return result;
     }
