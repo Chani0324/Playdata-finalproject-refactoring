@@ -45,9 +45,10 @@ public class PrincipalDetailsService implements UserDetailsService{
 	
 	@Transactional
     public void joinUser(User user) {
-        
-        int result = 0;
-        
+        System.out.println("user.getUserId() = " + user.getUserId());
+        System.out.println("user.getPassword() = " + user.getPassword());
+        System.out.println("user = " + user.getUserEmail());
+
         if (user.getUserId() != null && user.getPassword() != null && user.getUserEmail() != null) {
             
             User userId = userRepository.findByUserId(user.getUserId());
@@ -60,11 +61,8 @@ public class PrincipalDetailsService implements UserDetailsService{
                 
                 user.setPassword(encPassword);
                 userRepository.save(user);
-                
-                result = 1;
-            } else {
-                result = 2;
-            } 
+
+            }
         
         }
     }
