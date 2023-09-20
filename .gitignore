@@ -17,6 +17,11 @@ __pycache__/
 # C extensions
 *.so
 
+### Gradle ###
+# Exclude Folder List #
+.gradle/
+build/
+
 # Distribution / packaging
 .Python
 build/

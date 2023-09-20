@@ -138,10 +138,9 @@ public class IndexController {
             result.put("result", true);
 
             return result;
-        } else if(isExistId || isExistEmail) {
+        } else {
             result.put("isExistId", isExistId);
             result.put("isExistEmail", isExistEmail);
-
         }
         return result;
     }
@@ -182,16 +181,14 @@ public class IndexController {
         Map<String, Boolean> result = new HashMap<>();
         
         boolean isExistEmail = principalDetailService.checkExistUserEmail(user.getUserEmail());
-        System.out.println(isExistEmail);
-        
-        if(isExistEmail == true) {
+
+        if(isExistEmail) {
             result.put("result", true);
             return result;
-        }else if(isExistEmail == false) {
+        }else {
             result.put("result", false);
             return result;
         }
-        return result;
     }
     
     @GetMapping("/checkexistid")
@@ -329,8 +326,7 @@ public class IndexController {
     public Map<String, String> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         Map<String, String> result = new HashMap<>();
         
-        String authorizationHeader = request.getHeader(JwtProperties.HEADER_STRING);
-//        System.out.println(authorizationHeader);
+        String authorizationHeader = request.getHeader(JwtProperties.RT_HEADER_STRING);
 
         if(authorizationHeader != null && authorizationHeader.startsWith(JwtProperties.TOKEN_PREFIX)) {
             try {

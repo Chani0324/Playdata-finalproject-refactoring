@@ -1,5 +1,7 @@
 package com.cos.security1.config;
 
+import com.cos.security1.jwt.config.JwtRefreshTokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,41 +36,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity	// spring security 필터가 spring filterChain에 등록이 됨.
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled=true)	// secured annotaion 활성화 / preAuthorize, PostAuthorize annotation활성화
 public class SecurityConfig {
-    
-	@Autowired
-	private PrincipalOauth2UserService principalOauth2UserService;
-	
-	@Autowired
-	private PrincipalDetailsService principalDetailsService;
-	
-	@Autowired
-	private AuthenticationConfiguration authenticationConfiguration;
-	
-	@Autowired
-	private JsonLoginSuccessHandler jsonLoginSuccessHandler;
-	
-	@Autowired
-	private JsonLoginFailureHandler jsonLoginFailureHandler;
-	
-	@Autowired
-	private Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
-	
-	@Autowired
-	private Oauth2LoginFailureHandler oauth2LoginFailureHandler;
-	
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-    private ClientRegistrationRepository clientRegistrationRepository;
-	
-	@Autowired
-	private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-	
-	@Autowired
-	private ObjectMapper objectMapper;
+
+	private final PrincipalOauth2UserService principalOauth2UserService;
+	private final PrincipalDetailsService principalDetailsService;
+	private final AuthenticationConfiguration authenticationConfiguration;
+	private final JsonLoginSuccessHandler jsonLoginSuccessHandler;
+	private final JsonLoginFailureHandler jsonLoginFailureHandler;
+	private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
+	private final Oauth2LoginFailureHandler oauth2LoginFailureHandler;
+	private final UserRepository userRepository;
+	private final JwtRefreshTokenService jwtRefreshTokenService;
+	private final ClientRegistrationRepository clientRegistrationRepository;
+	private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+	private final ObjectMapper objectMapper;
 	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -190,7 +173,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
-                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper));
+                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper, jwtRefreshTokenService));
         }
     }
     
