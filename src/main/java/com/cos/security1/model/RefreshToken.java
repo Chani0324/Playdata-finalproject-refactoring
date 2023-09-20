@@ -24,7 +24,7 @@ public class RefreshToken{
     private int rfIndex;
     
     private String userId;
-    
+
     @Column(length = 2000)
     private String refreshToken;
     
@@ -38,5 +38,5 @@ public class RefreshToken{
         this.refreshToken = refreshToken;
         this.createDateToken = createDateToken;
     }
-    
+
 }

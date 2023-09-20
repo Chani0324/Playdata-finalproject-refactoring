@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -23,7 +25,7 @@ import lombok.Data;
 @Data
 public class PrincipalDetails implements UserDetails, OAuth2User{
 
-	private User user;	// composition
+	private final User user;	// composition
 	
 	private Map<String, Object> attributes;
 	
@@ -31,13 +33,13 @@ public class PrincipalDetails implements UserDetails, OAuth2User{
 	public PrincipalDetails(User user) {
 		this.user = user;
 	}
-	
+
 	// OAuth 로그인시 사용되는 생성자
 	public PrincipalDetails(User user, Map<String, Object> attributes) {
 		this.user = user;
 		this.attributes = attributes;
 	}
-	
+
 	// 해당 User의 권한을 리턴하는 곳
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
