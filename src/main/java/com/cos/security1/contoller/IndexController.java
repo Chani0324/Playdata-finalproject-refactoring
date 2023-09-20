@@ -331,7 +331,6 @@ public class IndexController {
         if(authorizationHeader != null && authorizationHeader.startsWith(JwtProperties.TOKEN_PREFIX)) {
             try {
                 Map<String, String> refreshTokenRequest = jwtRefreshTokenService.refresh(authorizationHeader.substring("Bearer.".length()));
-                System.out.println("##################################");
                 for (String mapKey:refreshTokenRequest.keySet()) {
                     System.out.println("Key:"+mapKey+", Value:"+refreshTokenRequest.get(mapKey));
                     
