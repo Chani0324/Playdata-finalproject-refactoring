@@ -62,14 +62,16 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.AT_EXPIRATION_TIME))  // 토큰 만료 시간((1분) * 10)
                 .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
                 .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
+                .withClaim("role", userEntity.getRole())    // 내가 넣고 싶은 비공개 key와 value 값
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-        
+
         // refresh token 생성
         String refreshToken = JWT.create()
                 .withSubject("cos토큰")   // 토큰 이름. 큰 의미는 없음.
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.RT_EXPIRATION_TIME))  // 토큰 만료 시간((1분) * 10)
                 .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
                 .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
+                .withClaim("role", userEntity.getRole())    // 내가 넣고 싶은 비공개 key와 value 값
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
         
 //        System.out.println("refreshToken : " + refreshToken);
