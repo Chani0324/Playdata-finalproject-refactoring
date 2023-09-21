@@ -1,5 +1,6 @@
 package com.cos.security1.jwt.config;
 
+import com.cos.security1.exception.NotHaveRefreshTokenException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +66,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
          */
         try {
             String accessTokenHeaderString = JwtProperties.AT_HEADER_STRING;
-            String refreshTokenHeaderString = JwtProperties.RT_HEADER_STRING;
 
             String jwtATToken = request.getHeader(accessTokenHeaderString)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
@@ -73,16 +73,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             long now = System.currentTimeMillis() / 1000;
 
             // 토큰 만료 검증하지는 않고 값만 가져옴.
-            Long accessTokenExpireTime = JWT.decode(jwtATToken).getClaim("exp").asLong();
+            DecodedJWT decodeAccessToken = JWT.decode(jwtATToken);
+            Long accessTokenExpireTime = decodeAccessToken.getClaim("exp").asLong();
 
             // 1. access token이 만료가 안 되었을 시 시큐리티 세션에 Authentication 정보 저장 및 filter 진행
             if (accessTokenExpireTime > now) {
-                DecodedJWT verifyAccessToken = getVerifyAccessToken(jwtATToken);
+                verifyAccessToken(jwtATToken);
 
-                String userId = verifyAccessToken.getClaim("userId").asString();
-                String userName = verifyAccessToken.getClaim("userName").asString();
+                String userId = decodeAccessToken.getClaim("userId").asString();
+                String userName = decodeAccessToken.getClaim("userName").asString();
 
-                String oauthEmail = verifyAccessToken.getClaim("oauthEmail").asString();
+                String oauthEmail = decodeAccessToken.getClaim("oauthEmail").asString();
 
                 if ((userId != null) && (userName != null)) {
                     authenticateUser(userRepository.findByUserId(userId));
@@ -98,46 +99,55 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     chain.doFilter(request, response);
                 }
 
-            } else { // 2, 3 access 토큰이 만료 되었을 시
-                String jwtRFToken = request.getHeader(refreshTokenHeaderString)
-                    .replace(JwtProperties.TOKEN_PREFIX, "");
+            } else { // 2, 3 access 토큰이 만료 되었을 시 최초로 사용자에게 refresh token 요청 필요 메시지 전달
+                String refreshTokenHeaderString = JwtProperties.RT_HEADER_STRING;
 
-                // refresh token 검증
-                Map<String, String> verifyRefreshToken = jwtRefreshTokenService.refresh(jwtRFToken);
+                if (request.getHeader(refreshTokenHeaderString) == null) {
+                    throw new NotHaveRefreshTokenException("refresh 토큰 필요");
 
-                if ((!verifyRefreshToken.get(accessTokenHeaderString)
-                    .isEmpty())) { // 2. acccess 토큰만 재발급
-                    String newAccessToken = verifyRefreshToken.get(accessTokenHeaderString);
+                } else {
+                    String jwtRFToken = request.getHeader(refreshTokenHeaderString)
+                        .replace(JwtProperties.TOKEN_PREFIX, "");
 
-                    String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
+                    // refresh token 검증
+                    Map<String, String> verifyRefreshToken = jwtRefreshTokenService.refresh(
+                        jwtRFToken);
 
-                    response.addHeader(accessTokenHeaderString,
-                        JwtProperties.TOKEN_PREFIX + newAccessToken);
+                    if (verifyRefreshToken.size() == 1) { // 2. acccess 토큰만 재발급
+                        String newAccessToken = verifyRefreshToken.get(accessTokenHeaderString);
 
-                    authenticateUser(userRepository.findByUserId(userId));
-                    chain.doFilter(request, response);
+                        String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
 
-                } else if ((!verifyRefreshToken.get(accessTokenHeaderString).isEmpty())
-                    && (!verifyRefreshToken.get(refreshTokenHeaderString)
-                    .isEmpty())) { // 3. access, refresh 토큰 둘다 재발급
-                    String newAccessToken = verifyRefreshToken.get(accessTokenHeaderString);
-                    String newRefreshToken = verifyRefreshToken.get(refreshTokenHeaderString);
+                        response.addHeader(accessTokenHeaderString,
+                            JwtProperties.TOKEN_PREFIX + newAccessToken);
 
-                    String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
+                        authenticateUser(userRepository.findByUserId(userId));
+                        chain.doFilter(request, response);
 
-                    response.addHeader(accessTokenHeaderString,
-                        JwtProperties.TOKEN_PREFIX + newAccessToken);
-                    response.addHeader(refreshTokenHeaderString,
-                        JwtProperties.TOKEN_PREFIX + newRefreshToken);
+                    } else if (verifyRefreshToken.size() == 2) { // 3. access, refresh 토큰 둘다 재발급
+                        String newAccessToken = verifyRefreshToken.get(accessTokenHeaderString);
+                        String newRefreshToken = verifyRefreshToken.get(refreshTokenHeaderString);
 
-                    authenticateUser(userRepository.findByUserId(userId));
-                    chain.doFilter(request, response);
+                        String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
+
+                        response.addHeader(accessTokenHeaderString,
+                            JwtProperties.TOKEN_PREFIX + newAccessToken);
+                        response.addHeader(refreshTokenHeaderString,
+                            JwtProperties.TOKEN_PREFIX + newRefreshToken);
+
+                        authenticateUser(userRepository.findByUserId(userId));
+                        chain.doFilter(request, response);
+                    }
                 }
             }
-        } catch (TokenExpiredException e) {    // 4. 토큰 만료 둘다
+        } catch (TokenExpiredException e) {
             System.out.println("토큰 만료");
 
-            responseInJson(response, "토큰 만료. 재 로그인이 필요합니다.");
+            responseInJson(response, "토큰 만료.");
+        } catch (NotHaveRefreshTokenException e) {
+            System.out.println("refresh 토큰 필요");
+
+            responseInJson(response, "refresh 토큰 필요");
         } catch (Exception e) {
             System.out.println("정상적인 토큰이 맞는지 확인 필요.");
             System.out.println("e = " + e);
@@ -159,8 +169,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         response.getWriter().write(result);
     }
 
-    private DecodedJWT getVerifyAccessToken(String jwtATToken) throws Exception {
-        return JWT.require(Algorithm.HMAC512(JwtProperties.SECRET))
+    private void verifyAccessToken(String jwtATToken) throws Exception {
+        JWT.require(Algorithm.HMAC512(JwtProperties.SECRET))
             .build().verify(jwtATToken);
     }
 

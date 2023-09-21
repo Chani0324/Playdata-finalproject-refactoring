@@ -52,33 +52,33 @@ public class SecurityConfig {
 	private final ClientRegistrationRepository clientRegistrationRepository;
 	private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 	private final ObjectMapper objectMapper;
-	
+
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 	     return authenticationConfiguration.getAuthenticationManager();
 	};
-	
-	
+
+
 	// @Bean 등록시 해당 method의 리턴되는 오브젝트를 loC로 등록 해줌. -> 필드 전역에서 사용 가능.
 	@Bean
 	public BCryptPasswordEncoder encodePwd() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-           
+
         authProvider.setUserDetailsService(principalDetailsService);
         authProvider.setPasswordEncoder(encodePwd());
-       
+
         return authProvider;
     }
-	
-    
+
+
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-	    
+
 		return http
 //				.httpBasic().disable()
 				.cors().configurationSource(corsConfigurationSource())	// CORS 설정
@@ -92,7 +92,7 @@ public class SecurityConfig {
 				.loginPage("/loginForm")
 				.and()
 				.apply(new MyCustomDsl())
-				.and() 
+				.and()
 //				.usernameParameter("username")  // 로그인 시 id로 받을 parameter
 //				.passwordParameter("password")  // 로그인 시 password로 받을 parameter
 //				.loginPage("/loginForm")
@@ -120,7 +120,8 @@ public class SecurityConfig {
 				.and()
 				.authorizeRequests(authorize -> authorize
 						.antMatchers("/user/**")
-						.authenticated()	// 인증만 되면 들어갈 수 있는 주소
+//						.authenticated()	// 인증만 되면 들어갈 수 있는 주소
+						.access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_USER')")
 						.antMatchers("/manager/**")
 						.access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
 						.antMatchers("/admin/**")
@@ -128,7 +129,7 @@ public class SecurityConfig {
 						.anyRequest().permitAll())
 				.build();
 	}
-	
+
     // CORS 허용 적용
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -148,11 +149,11 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-	
+
     // JSON custom login을 위한 authenticationFilter method 설정
     protected JsonUsernamePasswordAuthenticationFilter getAuthenticationFilter() {
         JsonUsernamePasswordAuthenticationFilter authFilter = new JsonUsernamePasswordAuthenticationFilter();
-        
+
         try {
             authFilter.setFilterProcessesUrl("/login");
             authFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
@@ -160,14 +161,14 @@ public class SecurityConfig {
             authFilter.setPasswordParameter("password");
             authFilter.setAuthenticationSuccessHandler(jsonLoginSuccessHandler);
             authFilter.setAuthenticationFailureHandler(jsonLoginFailureHandler);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return authFilter;
     }
-    
-    
+
+
     public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurity> {
         @Override
         public void configure(HttpSecurity http) throws Exception {
@@ -176,5 +177,5 @@ public class SecurityConfig {
                     .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper, jwtRefreshTokenService));
         }
     }
-    
+
 }
