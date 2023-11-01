@@ -48,7 +48,7 @@ public class JwtRefreshTokenService {
 
                     refreshTokenRepository.save(rfToken);
                 } else {
-                    findRefreshToken.setRefreshToken(refreshToken);
+                    findRefreshToken.updateRefreshToken(refreshToken);
 
                     refreshTokenRepository.save(findRefreshToken);
                 }
@@ -144,8 +144,6 @@ public class JwtRefreshTokenService {
                 userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
             .withClaim("userName",
                 userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
-            .withClaim("role",
-                userEntity.getRole())    // 내가 넣고 싶은 비공개 key와 value 값
             .sign(Algorithm.HMAC512(JwtProperties.SECRET));
     }
 
