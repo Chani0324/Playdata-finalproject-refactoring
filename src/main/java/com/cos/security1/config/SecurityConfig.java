@@ -1,8 +1,9 @@
 package com.cos.security1.config;
 
 import com.cos.security1.jwt.config.JwtRefreshTokenService;
+import com.cos.security1.logoutconfig.CustomLogoutHandler;
+import com.cos.security1.repository.AccessTokenBanListRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,35 +36,37 @@ import com.cos.security1.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@EnableWebSecurity	// spring security 필터가 spring filterChain에 등록이 됨.
+@EnableWebSecurity(debug = true)    // spring security 필터가 spring filterChain에 등록이 됨.
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled=true)	// secured annotaion 활성화 / preAuthorize, PostAuthorize annotation활성화
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+// secured annotaion 활성화 / preAuthorize, PostAuthorize annotation활성화
 public class SecurityConfig {
 
-	private final PrincipalOauth2UserService principalOauth2UserService;
-	private final PrincipalDetailsService principalDetailsService;
-	private final AuthenticationConfiguration authenticationConfiguration;
-	private final JsonLoginSuccessHandler jsonLoginSuccessHandler;
-	private final JsonLoginFailureHandler jsonLoginFailureHandler;
-	private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
-	private final Oauth2LoginFailureHandler oauth2LoginFailureHandler;
-	private final UserRepository userRepository;
-	private final JwtRefreshTokenService jwtRefreshTokenService;
-	private final ClientRegistrationRepository clientRegistrationRepository;
-	private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-	private final ObjectMapper objectMapper;
+    private final PrincipalOauth2UserService principalOauth2UserService;
+    private final PrincipalDetailsService principalDetailsService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JsonLoginSuccessHandler jsonLoginSuccessHandler;
+    private final JsonLoginFailureHandler jsonLoginFailureHandler;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
+    private final Oauth2LoginFailureHandler oauth2LoginFailureHandler;
+    private final UserRepository userRepository;
+    private final JwtRefreshTokenService jwtRefreshTokenService;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+    private final ObjectMapper objectMapper;
+    private final AccessTokenBanListRepository accessTokenBanListRepository;
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-	     return authenticationConfiguration.getAuthenticationManager();
-	};
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 
-
-	// @Bean 등록시 해당 method의 리턴되는 오브젝트를 loC로 등록 해줌. -> 필드 전역에서 사용 가능.
-	@Bean
-	public BCryptPasswordEncoder encodePwd() {
-		return new BCryptPasswordEncoder();
-	}
+    // @Bean 등록시 해당 method의 리턴되는 오브젝트를 loC로 등록 해줌. -> 필드 전역에서 사용 가능.
+    @Bean
+    public BCryptPasswordEncoder encodePwd() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -76,59 +79,63 @@ public class SecurityConfig {
     }
 
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		return http
+        return http
 //				.httpBasic().disable()
-				.cors().configurationSource(corsConfigurationSource())	// CORS 설정
-				.and()
-				.csrf().disable()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 정보 사용 안함 (JWT 사용하기 위한 설정)
-				.and()
-				.formLogin().disable()  // formLogin().disable() 후 특정 조건만 활성화..?
-				.httpBasic().disable()
-				.formLogin()
-				.loginPage("/loginForm")
-				.and()
-				.apply(new MyCustomDsl())
-				.and()
+                .cors().configurationSource(corsConfigurationSource())    // CORS 설정
+                .and()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 정보 사용 안함 (JWT 사용하기 위한 설정)
+                .and()
+                .formLogin().disable()  // formLogin().disable() 후 특정 조건만 활성화..?
+                .httpBasic().disable()
+                .formLogin()
+                .loginPage("/loginForm")
+                .and()
+                .apply(new MyCustomDsl())
+                .and()
+                .logout()
+                .logoutSuccessHandler(customLogoutHandler)
+                .clearAuthentication(true)  // 인증 정보 삭제.
+                .invalidateHttpSession(true)    // 세션 무효화.
+                .deleteCookies("JSESSIONID")
+                .deleteCookies(JwtProperties.AT_HEADER_STRING)
+                .and()
 //				.usernameParameter("username")  // 로그인 시 id로 받을 parameter
 //				.passwordParameter("password")  // 로그인 시 password로 받을 parameter
 //				.loginPage("/loginForm")
 //				.loginProcessingUrl("/login")	// /login 주소가 호출이 되면 security가 낚아채서 대신 로그인을 진행해줍니다. controller에 /login을 안 만들어 주어도 됨!
 //				.defaultSuccessUrl("/")
-				.addFilterAt(getAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-				.authenticationProvider(authenticationProvider())
+                .addFilterAt(getAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAfter(new JwtLogoutFilter(userRepository), LogoutFilter.class)
+                .authenticationProvider(authenticationProvider())
 //				.addFilterAt(getOauth2AuthenticationFilter(), OAuth2LoginAuthenticationFilter.class)
-				.oauth2Login()
-				.successHandler(oauth2LoginSuccessHandler)
-				.failureHandler(oauth2LoginFailureHandler)
+                .oauth2Login()
+                .successHandler(oauth2LoginSuccessHandler)
+                .failureHandler(oauth2LoginFailureHandler)
 //				.loginPage("/loginForm")
-				                                /* 구글 로그인 완료된 후 후처리 필요(1.코드 받기(인증), 2.액세스토큰(권한), 3.사용자프로필 정보 가져옴, 4-1.그 정보를 토대로 회원가입 자동으로 진행,
-				 							   4-2.사용자의 등록 정보가 부족할 경우(예를들어 주소지 등이 추가적으로 필요)
-				 							   Tip.코드를 주지는 않음(액세스토큰+사용자프로필정보O) */
-				.userInfoEndpoint()
-				.userService(principalOauth2UserService)
-				.and()	// and의 타입을 맞춰주기 위해 여러개 넣어줘야 하는 경우가 있음.. ㅡㅅㅡ.... 여긴 oauth타입 and()
-				.and()	// 여긴 httpsecurity and()
-				.logout()
-				.clearAuthentication(true)  // 인증 정보 삭제.
-				.invalidateHttpSession(true)    // 세션 무효화.
-				.deleteCookies("JSESSIONID")
-				.deleteCookies(JwtProperties.AT_HEADER_STRING)
-				.and()
-				.authorizeRequests(authorize -> authorize
-						.antMatchers("/user/**")
+                /* 구글 로그인 완료된 후 후처리 필요(1.코드 받기(인증), 2.액세스토큰(권한), 3.사용자프로필 정보 가져옴, 4-1.그 정보를 토대로 회원가입 자동으로 진행,
+                4-2.사용자의 등록 정보가 부족할 경우(예를들어 주소지 등이 추가적으로 필요)
+                Tip.코드를 주지는 않음(액세스토큰+사용자프로필정보O) */
+                .userInfoEndpoint()
+                .userService(principalOauth2UserService)
+                .and()    // and의 타입을 맞춰주기 위해 여러개 넣어줘야 하는 경우가 있음.. ㅡㅅㅡ.... 여긴 oauth타입 and()
+                .and()    // 여긴 httpsecurity and()
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers("/user/**")
 //						.authenticated()	// 인증만 되면 들어갈 수 있는 주소
-						.access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_USER')")
-						.antMatchers("/manager/**")
-						.access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-						.antMatchers("/admin/**")
-						.access("hasRole('ROLE_ADMIN')")
-						.anyRequest().permitAll())
-				.build();
-	}
+                        .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_USER')")
+                        .antMatchers("/manager/**")
+                        .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+                        .antMatchers("/admin/**")
+                        .access("hasRole('ROLE_ADMIN')")
+                        .antMatchers("/logout/**")
+                        .access("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER') or hasRole('ROLE_USER')")
+                        .anyRequest().permitAll())
+                .build();
+    }
 
     // CORS 허용 적용
     @Bean
@@ -148,6 +155,11 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    protected JwtAuthorizationFilter getJwtAuthorizationFilter(HttpSecurity http) {
+        AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+        return new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper, jwtRefreshTokenService, accessTokenBanListRepository);
     }
 
     // JSON custom login을 위한 authenticationFilter method 설정
@@ -174,7 +186,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
-                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper, jwtRefreshTokenService));
+                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository, objectMapper, jwtRefreshTokenService, accessTokenBanListRepository));
         }
     }
 

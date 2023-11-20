@@ -1,9 +1,11 @@
 package com.cos.security1.jwt.config;
 
 import com.cos.security1.exception.NotHaveRefreshTokenException;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.cos.security1.model.AccessTokenBanList;
+import com.cos.security1.repository.AccessTokenBanListRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,20 +43,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final JwtRefreshTokenService jwtRefreshTokenService;
 
+    private final AccessTokenBanListRepository accessTokenBanListRepository;
+
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
-        UserRepository userRepository, ObjectMapper objectMapper,
-        JwtRefreshTokenService jwtRefreshTokenService) {
+                                  UserRepository userRepository, ObjectMapper objectMapper,
+                                  JwtRefreshTokenService jwtRefreshTokenService, AccessTokenBanListRepository accessTokenBanListRepository) {
         super(authenticationManager);
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.jwtRefreshTokenService = jwtRefreshTokenService;
+        this.accessTokenBanListRepository = accessTokenBanListRepository;
     }
 
     // 무조건 한번은 지나치게 되는 기본 권한확인 필터
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain chain)
-        throws IOException, ServletException {
+                                    FilterChain chain)
+            throws IOException, ServletException {
 
         if (validateDoFilter(request, response)) {
             chain.doFilter(request, response);
@@ -63,12 +71,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
          * 2. access token이 만료가 된 경우 DB에 저장된 refresh 토큰과 비교하여 일치하면 access token 재발급.(불일치면 err)
          * 3. access token이 만료가 된 경우 + refresh 토큰 만료 시 .
          * 4. accress token, refresh token 둘다 만료되었으면 로그인 재요청
+         * 5. banlist에 등록된 access token이면(로그아웃 된 client) 로그인이 필요하다는 예외처리.
          */
         try {
             String accessTokenHeaderString = JwtProperties.AT_HEADER_STRING;
 
             String jwtATToken = request.getHeader(accessTokenHeaderString)
-                .replace(JwtProperties.TOKEN_PREFIX, "");
+                    .replace(JwtProperties.TOKEN_PREFIX, "");
+
+            // 5. banlist에 등록된 access token 먼저 검증
+            Optional<AccessTokenBanList> findBanList = Optional.ofNullable(accessTokenBanListRepository.findByAccessToken(jwtATToken));
+            if (findBanList.isPresent()) {
+                responseInJson(response, "밴리스트에 등록된 토큰입니다. 재 로그인 해주세요.");
+                return;
+            }
 
             long now = System.currentTimeMillis() / 1000;
 
@@ -76,7 +92,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             DecodedJWT decodeAccessToken = JWT.decode(jwtATToken);
             Long accessTokenExpireTime = decodeAccessToken.getClaim("exp").asLong();
 
-            // 1. access token이 만료가 안 되었을 시 시큐리티 세션에 Authentication 정보 저장 및 filter 진행
+            // 1. access token이 만료가 안 되었을 시 SecurityContextHolder에 Authentication 정보 저장 및 filter 진행
             if (accessTokenExpireTime > now) {
                 verifyAccessToken(jwtATToken);
 
@@ -91,10 +107,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                 } else if (userId == null && oauthEmail != null) { // OAuth2 로그인 시 서명이 정상적으로 된 경우.
                     authenticateUser(User.builder()
-                        .userId("guest")
-                        .userEmail(oauthEmail)
-                        .role("ROLE_USER")
-                        .build());
+                            .userId("guest")
+                            .userEmail(oauthEmail)
+                            .role("ROLE_USER")
+                            .build());
 
                     chain.doFilter(request, response);
                 }
@@ -107,11 +123,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
                 } else {
                     String jwtRFToken = request.getHeader(refreshTokenHeaderString)
-                        .replace(JwtProperties.TOKEN_PREFIX, "");
+                            .replace(JwtProperties.TOKEN_PREFIX, "");
 
                     // refresh token 검증
                     Map<String, String> verifyRefreshToken = jwtRefreshTokenService.refresh(
-                        jwtRFToken);
+                            jwtRFToken);
 
                     if (verifyRefreshToken.size() == 1) { // 2. acccess 토큰만 재발급
                         String newAccessToken = verifyRefreshToken.get(accessTokenHeaderString);
@@ -119,7 +135,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
 
                         response.addHeader(accessTokenHeaderString,
-                            JwtProperties.TOKEN_PREFIX + newAccessToken);
+                                JwtProperties.TOKEN_PREFIX + newAccessToken);
 
                         authenticateUser(userRepository.findByUserId(userId));
                         chain.doFilter(request, response);
@@ -131,9 +147,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                         String userId = JWT.decode(newAccessToken).getClaim("userId").asString();
 
                         response.addHeader(accessTokenHeaderString,
-                            JwtProperties.TOKEN_PREFIX + newAccessToken);
+                                JwtProperties.TOKEN_PREFIX + newAccessToken);
                         response.addHeader(refreshTokenHeaderString,
-                            JwtProperties.TOKEN_PREFIX + newRefreshToken);
+                                JwtProperties.TOKEN_PREFIX + newRefreshToken);
 
                         authenticateUser(userRepository.findByUserId(userId));
                         chain.doFilter(request, response);
@@ -158,7 +174,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private void responseInJson(HttpServletResponse response, String message)
-        throws IOException {
+            throws IOException {
 
         Map<String, String> map = new HashMap<>();
         map.put("result", message);
@@ -171,7 +187,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private void verifyAccessToken(String jwtATToken) throws Exception {
         JWT.require(Algorithm.HMAC512(JwtProperties.SECRET))
-            .build().verify(jwtATToken);
+                .build().verify(jwtATToken);
     }
 
     private boolean validateDoFilter(HttpServletRequest request, HttpServletResponse response) {
@@ -181,7 +197,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String jwtATHeader = request.getHeader(JwtProperties.AT_HEADER_STRING);
 
         if (servletPath.equals("/login") || servletPath.equals("/refresh") || servletPath.equals(
-            "/join")) {
+                "/join")) {
             return true;
         }
 
@@ -198,7 +214,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         // Jwt 토큰 서명을 통해서 서명이 정상이면 Authentication 객체를 만들어 준다. 정상적인 로그인을 통한 객체를 만드는 것은 아님.
         Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
-            null, principalDetails.getAuthorities());
+                null, principalDetails.getAuthorities());
 
         // 강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장.
         SecurityContextHolder.getContext().setAuthentication(authentication);

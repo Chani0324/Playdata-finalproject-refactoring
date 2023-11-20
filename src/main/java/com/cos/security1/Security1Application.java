@@ -2,6 +2,7 @@ package com.cos.security1;
 
 import com.cos.security1.model.AccessTokenBanList;
 import com.cos.security1.model.User;
+import com.cos.security1.repository.AccessTokenBanListRepository;
 import com.cos.security1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import javax.persistence.EntityManager;
 
 
 @SpringBootApplication
-@EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {AccessTokenBanList.class}))
+@EnableJpaRepositories(excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {AccessTokenBanListRepository.class}))
 public class Security1Application {
 
 	public static void main(String[] args) {
