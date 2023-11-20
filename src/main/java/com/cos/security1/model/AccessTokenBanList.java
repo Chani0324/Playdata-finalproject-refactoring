@@ -17,19 +17,26 @@ import javax.persistence.*;
 public class AccessTokenBanList {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int atIndex;
+    private String atIndex;
 
     @Column(length = 2000)
     @Indexed
     private String accessToken;
 
     @TimeToLive // 초단위
-    private int ttl;
+    private long ttl;
 
     @Builder
-    public AccessTokenBanList(String accessToken, int ttl) {
+    public AccessTokenBanList(String accessToken, long ttl) {
         this.accessToken = accessToken;
         this.ttl = ttl;
+    }
+
+    @Override
+    public String toString() {
+        return "AccessTokenBanList{" +
+                "accessToken='" + accessToken + '\'' +
+                ", ttl=" + ttl +
+                '}';
     }
 }

@@ -27,33 +27,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
+@Configuration
+public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
-    
+
     private final JwtRefreshTokenService jwtRefreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
-        
+                                        Authentication authentication) throws IOException, ServletException {
+
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
-        
-        PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
-        
+
+        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+
         User userEntity = principalDetails.getUser();
-        
+
         Map<String, String> map = new HashMap<>();
-        
+
         map.put("result", "true");
         map.put("userId", userEntity.getUserId());
         map.put("userName", userEntity.getUserName());
         map.put("userEmail", userEntity.getUserEmail());
-        
+
         String result = objectMapper.writeValueAsString(map);
-        
+
         // RSA방식이 아닌 Hash암호방식
         // access token 생성
         String accessToken = JWT.create()
@@ -71,7 +72,7 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
                 .withClaim("userId", userEntity.getUserId())    // 내가 넣고 싶은 비공개 key와 value 값
                 .withClaim("userName", userEntity.getUserName())    // 내가 넣고 싶은 비공개 key와 value 값
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
-        
+
 //        System.out.println("refreshToken : " + refreshToken);
 //        System.out.println("userEntity : " + userEntity);
         // refresh token DB에 저장
@@ -83,7 +84,7 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
         response.addHeader(JwtProperties.AT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
         response.addHeader(JwtProperties.RT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + refreshToken);
 //        response.sendRedirect("/");
-        
+
 //        Cookie cookie1 = new Cookie(JwtProperties.AT_HEADER_STRING, JwtProperties.TOKEN_PREFIX + accessToken);
 ////        cookie1.setDomain("localhost:3000");
 //        cookie1.setPath("/");
@@ -99,8 +100,8 @@ public class JsonLoginSuccessHandler implements AuthenticationSuccessHandler{
 //        response.addCookie(cookie1);
 //        response.addCookie(cookie2);
         response.getWriter().write(result);
-        
-        
+
+
     }
 
 }

@@ -17,21 +17,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class NotSignedUser{
-    
+public class NotSignedUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int indexId;
-    
+
     private String visitUserIp;
-    
+
     private int usedCount;
-    
+
     @Builder
-    public NotSignedUser(int indexId, String visitUserIp, int usedCount ) {
+    public NotSignedUser(int indexId, String visitUserIp, int usedCount) {
         this.indexId = indexId;
         this.visitUserIp = visitUserIp;
         this.usedCount = usedCount;
     }
-    
+
 }

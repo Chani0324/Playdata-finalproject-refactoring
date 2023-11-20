@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Configuration
 public class JsonLoginFailureHandler implements AuthenticationFailureHandler {
     
     private final ObjectMapper objectMapper;
