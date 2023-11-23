@@ -22,11 +22,4 @@ public class RedisConfig {
         return new LettuceConnectionFactory(host, port);
     }
 
-   @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<?, ?> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
-        template.setKeySerializer(new StringRedisSerializer());
-        return template;
-    }
 }

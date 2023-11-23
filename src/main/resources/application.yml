@@ -11,12 +11,14 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://db-3team-project.ckirsmdzwudh.ap-northeast-2.rds.amazonaws.com:3306/security?serverTimezone=Asia/Seoul
-    url: jdbc:mysql://localhost:3306/playdata_project_refactor?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/playdata_project_refactor?useSSL=false
+#    url: jdbc:mysql://mysql-test:3306/playdata_project_refactor?useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: playdata
 
   redis:
     host: localhost
+#    host: redis-container
     port: 6379
 
 
