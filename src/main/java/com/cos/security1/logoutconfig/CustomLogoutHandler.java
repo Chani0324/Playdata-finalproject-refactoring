@@ -43,14 +43,11 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
         response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("utf-8");
 
-        // access 토큰을 어떻게 가져올 것이냐? -> request의 header에서 정보를 가져와야 함.
-        // 1. header에 access 토큰에 대한 정보가 없으면?(여기선 예외를 따로 설정하지 않는다...?) 있다면 ban list 등록 진행.
         String accessTokenHeaderString = JwtProperties.AT_HEADER_STRING;
 
         String jwtATToken = request.getHeader(accessTokenHeaderString)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
 
-        // access token에서 만료 시간을 가져오기. -> logout 시에도 access 토큰 한번 검증이 필요해 보임.
         DecodedJWT decodeAccessToken = JWT.decode(jwtATToken);
         String userId = decodeAccessToken.getClaim("userId").asString();
         Long accessTokenExpireTime = decodeAccessToken.getClaim("exp").asLong();
@@ -59,7 +56,6 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
 
         long ttlTime = accessTokenExpireTime - now;
 
-        // ban list를 access token만? 아니면 refresh token도..? 일단 access token만 진행시켜봄.
         AccessTokenBanList banList = AccessTokenBanList.builder()
                 .accessToken(jwtATToken)
                 .ttl(ttlTime)
@@ -72,6 +68,12 @@ public class CustomLogoutHandler implements LogoutSuccessHandler {
         Optional<RefreshToken> findRefreshToken = Optional.ofNullable(refreshTokenRepository.findByUserId(userId));
 
         findRefreshToken.ifPresent(refreshToken -> refreshTokenRepository.deleteById(refreshToken.getRfIndex()));
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("result", "access token는 banlist 등록, refresh token은 삭제 완료");
+        String result = objectMapper.writeValueAsString(map);
+        response.getWriter().write(result);
     }
 
 }

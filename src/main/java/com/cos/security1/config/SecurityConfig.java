@@ -36,7 +36,8 @@ import com.cos.security1.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
-@EnableWebSecurity(debug = true)    // spring security 필터가 spring filterChain에 등록이 됨.
+//@EnableWebSecurity(debug = true)    // spring security 필터가 spring filterChain에 등록이 됨.
+@EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 // secured annotaion 활성화 / preAuthorize, PostAuthorize annotation활성화
